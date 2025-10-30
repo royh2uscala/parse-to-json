@@ -22,14 +22,14 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/somebizdomain")
-public class SomeBizDomainConverterController {
+public class DomainConvertController {
     private static final String OUTPUT_JSON_FILE_NAME = "OutcomeFile.json";
     private final TextDataToDomainConverter<SomeBizDomain> someBizDomainConverter;
     private final ObjectMapper objectMapper;
 
     private final FileUploadValidator fileUploadValidator;
 
-    public SomeBizDomainConverterController(
+    public DomainConvertController(
             TextDataToDomainConverter<SomeBizDomain> someBizDomainConverter,
             ObjectMapper objectMapper,
             FileUploadValidator fileUploadValidator) {

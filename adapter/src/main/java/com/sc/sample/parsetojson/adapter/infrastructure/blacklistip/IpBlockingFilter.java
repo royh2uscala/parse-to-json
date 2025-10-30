@@ -17,7 +17,14 @@ public class IpBlockingFilter implements Filter {
     private final BlackListGeoConfig blackListService;
     private final List<String> blackListIspSearchTokens;
    public static final String X_FORWARDED_FOR = "X-Forwarded-For";
-
+   static final String MISSING_IP_INFO_ERROR_MSG =
+           "Internal System error - IP information missing";
+   static final String BLOCKED_REQUEST_BY_COUNTRY_ERROR_MGS =
+           "Access is blocked for country:%s";
+    static final String BLOCKED_REQUEST_BY_ISP_ERROR_MGS =
+            "Access is blocked for isp:%s";
+    static final String BLOCKED_REQUEST_BY_COUNTRY_AND_ISP_ERROR_MGS =
+            "Access is blocked for country:%s and for isp:%s";
     public IpBlockingFilter(BlackListGeoConfig blackListService) {
         this.blackListService = blackListService;
         this.blackListIspSearchTokens = blackListService.getIspDataCenterVenues().stream()
@@ -44,23 +51,38 @@ public class IpBlockingFilter implements Filter {
                             IpBlockingFilter.class.getSimpleName()));
 
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Internal System error - IP information missing");
+                    MISSING_IP_INFO_ERROR_MSG);
             return;
         }
 
-        if (shouldBlockIp(ipApiResponse)) {
-            httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN,
-                    "Access is blocked: isp:%s or is blocked for country:%s"
-                            .formatted(ipApiResponse.isp(), ipApiResponse.countryCode()));
+        BlockStatus blockStatus = blockIpStatus(ipApiResponse);
+
+        if (BlockStatus.OK == blockStatus || BlockStatus.IP_QUERY_FAILED == blockStatus ) {
+            System.out.println("ok - requestor IP is allowed blockStatus:%s"
+                    .formatted(blockStatus));
+            filterChain.doFilter(servletRequest, servletResponse);
             return;
         } else {
-            filterChain.doFilter(servletRequest, servletResponse);
+            String errorMsg = switch (blockStatus) {
+                case BLOCKED_BY_BOTH -> BLOCKED_REQUEST_BY_COUNTRY_AND_ISP_ERROR_MGS
+                        .formatted(ipApiResponse.countryCode(), ipApiResponse.isp());
+                case BLOCKED_BY_ISP -> BLOCKED_REQUEST_BY_ISP_ERROR_MGS
+                        .formatted(ipApiResponse.isp());
+                case BLOCK_BY_COUNTRY -> BLOCKED_REQUEST_BY_COUNTRY_ERROR_MGS
+                        .formatted(ipApiResponse.countryCode());
+
+                case OK, IP_QUERY_FAILED -> "";
+            };
+            httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, errorMsg);
+            return;
         }
     }
 
-    private boolean shouldBlockIp(IpApiResponse ipApiResponse) {
-        if (!"success".equalsIgnoreCase(ipApiResponse.status())) return false;
+    private BlockStatus blockIpStatus(IpApiResponse ipApiResponse) {
+        if (!"success".equalsIgnoreCase(ipApiResponse.status()))
+            return BlockStatus.IP_QUERY_FAILED;
 
+        BlockStatus blockStatus = null;
         boolean blockIpByCountry = ipApiResponse.countryCode() != null
                 && blackListService.getIsoCountries().contains(ipApiResponse.countryCode());
 
@@ -69,13 +91,24 @@ public class IpBlockingFilter implements Filter {
                             .anyMatch(searchToken ->
                                     searchToken.contains(ipApiResponse.isp().toLowerCase()));
 
-        if (blockIpByCountry || blockIpByISP)
-            System.out.println(
-                    "Access is blocked: isp:%s or is blocked for country:%s,"
-                            .concat("blockIpByCountry:%s, blockIpByISP:%s")
-                    .formatted(ipApiResponse.isp(), ipApiResponse.countryCode(),
-                            blockIpByCountry, blockIpByISP));
+        if (blockIpByCountry && blockIpByISP)
+            return BlockStatus.BLOCKED_BY_BOTH;
+        if (blockIpByCountry)
+            return BlockStatus.BLOCK_BY_COUNTRY;
+        if (blockIpByISP)
+            return BlockStatus.BLOCKED_BY_ISP;
+        else
+            return BlockStatus.OK;
 
-        return blockIpByCountry || blockIpByISP;
+//        if (blockIpByCountry || blockIpByISP)
+//            System.out.println(
+//                    "Access is blocked: isp:%s or is blocked for country:%s,"
+//                            .concat("blockIpByCountry:%s, blockIpByISP:%s")
+//                    .formatted(ipApiResponse.isp(), ipApiResponse.countryCode(),
+//                            blockIpByCountry, blockIpByISP));
+//
+//        return blockIpByCountry || blockIpByISP;
     }
+
+    private enum BlockStatus {BLOCK_BY_COUNTRY, BLOCKED_BY_ISP, BLOCKED_BY_BOTH, OK, IP_QUERY_FAILED}
 }

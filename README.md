@@ -11,3 +11,10 @@ cat OutcomeFile.json
 docker-compose down -v
 
 docker exec -it postgres-db psql -U devco01 -d requestinfodb
+
+======================================
+
+https://github.com/royh2uscala/parse-to-json.git
+
+
+

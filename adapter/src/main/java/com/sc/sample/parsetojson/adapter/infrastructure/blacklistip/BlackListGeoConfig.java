@@ -10,7 +10,6 @@ import java.util.List;
 public class BlackListGeoConfig {
         private List<String> isoCountries;
         private List<IspDataCenterVenueWrapper> ispDataCenterVenues;
-        private int cacheExpiryMinutes;
 
     public List<String> getIsoCountries() {
         return isoCountries;
@@ -28,25 +27,21 @@ public class BlackListGeoConfig {
         this.ispDataCenterVenues = ispDataCenterVenues;
     }
 
-    public int getCacheExpiryMinutes() {
-        return cacheExpiryMinutes;
-    }
-
-    public void setCacheExpiryMinutes(int cacheExpiryMinutes) {
-        this.cacheExpiryMinutes = cacheExpiryMinutes;
-    }
-
     @Override
     public String toString() {
         return "BlackListGeoConfig{" +
                 "isoCountries=" + isoCountries +
                 ", ispDataCenterVenues=" + ispDataCenterVenues +
-                ", cacheExpiryMinutes=" + cacheExpiryMinutes +
                 '}';
     }
 
     static public class IspDataCenterVenueWrapper {
         private Venue venue;
+
+        public IspDataCenterVenueWrapper(){}
+        public IspDataCenterVenueWrapper(Venue venue) {
+            this.venue = venue;
+        }
 
         public Venue getVenue() {
             return venue;
@@ -67,6 +62,13 @@ public class BlackListGeoConfig {
     static public class Venue {
         private String code;
         private List<String> searchTokens;
+
+        public Venue() {}
+
+        public Venue(String code, List<String> searchTokens) {
+            this.code = code;
+            this.searchTokens = searchTokens;
+        }
 
         public String getCode() {
             return code;

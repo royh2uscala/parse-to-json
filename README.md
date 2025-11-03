@@ -107,6 +107,7 @@ View the result file:
 ```bash
 cat OutcomeFile.json
 ```
+Alternatively you can use tools like Postman to submit the test REST calls.
 
 ---
 
@@ -154,6 +155,10 @@ parse-to-json/
 │   ├── src/main/java/com/sc/sample/parsetojson/application
 │   └── src/test/java/...         # Unit tests for business logic
 │
+├── model/                        # Core business domain model layer
+│   ├── src/main/java/com/sc/sample/parsetojson/model
+│   └── src/test/java/...         # Unit tests for domain model
+│
 ├── bootstrap/                    # Entry point module (Spring Boot launcher, configuration)
 │   ├── docker-compose.yml        # PostgreSQL container setup
 │   ├── src/main/java/com/sc/sample/parsetojson/bootstrap
@@ -161,6 +166,7 @@ parse-to-json/
 │
 ├── pom.xml                       # Parent POM (module aggregator)
 └── README.md                     # Project documentation
+
 ```
 
 This modular layout follows a **Hexagonal (Ports and Adapters)** architecture,
@@ -182,14 +188,18 @@ keeping business logic decoupled from infrastructure and entry points.
 ### 🧰 Requirements
 
 * **Java 17+**
+* **Spring Boot 3.4.11**
 * **Maven 3.8+**
-* **Docker** (for PostgreSQL container)
+* **Docker (for PostgreSQL container Live Test)**
+* **Wire Mock (for mocking external REST service ip-api.com)**
+* **Test Containers (Postgres for end 2 end Integration Test)**
+
 
 ---
 
 ### 🧑‍💻 Author
 
-**Roy Huang**
+**Delroy Hughes**
 📦 [GitHub: royh2uscala](https://github.com/royh2uscala)
 
 ---
@@ -198,12 +208,3 @@ keeping business logic decoupled from infrastructure and entry points.
 
 This project is licensed under the [MIT License](LICENSE).
 
-```
-
----
-
-✅ You can copy this entire block directly into your `README.md`.  
-It will render beautifully on GitHub with proper icons, color-coded badges, and clear developer instructions.
-
-Would you like me to also generate a **lightweight “quick start” section** (e.g., 3 commands to get the app running end-to-end) for the very top of the README? It’s great for new contributors or demos.
-```

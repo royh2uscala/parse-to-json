@@ -3,6 +3,8 @@ package com.sc.sample.parsetojson.adapter.out.persistence.httprequest.jpa;
 import com.sc.sample.parsetojson.adapter.infrastructure.httprequest.HttpRequestInfo;
 import com.sc.sample.parsetojson.adapter.infrastructure.httprequest.RequestInfo;
 
+import java.util.List;
+
 public class RequestInfoMapper {
 
     public static RequestInfoJpaEntity toJpaEntity(HttpRequestInfo requestInfoModel) {
@@ -12,10 +14,15 @@ public class RequestInfoMapper {
         jpaEntity.setStartTime(requestInfoModel.getStartTime());
         jpaEntity.setHttpResponseCode(requestInfoModel.getHttpResponseCode());
         jpaEntity.setRequesterIp(requestInfoModel.getRequesterIp());
+        System.out.println("toJpaEntity - requestInfoModel.getRequesterCountryCode()=" + requestInfoModel.getRequesterCountryCode());
         jpaEntity.setRequesterCountryCode(requestInfoModel.getRequesterCountryCode());
         jpaEntity.setIspProviderIp(requestInfoModel.getIspProviderIp());
         jpaEntity.setTimeLapsedMilli(requestInfoModel.getTimeLapsedMilli());
         return jpaEntity;
+    }
+
+    public static List<HttpRequestInfo> toDomainModel(List<RequestInfoJpaEntity> jpaEntities) {
+        return jpaEntities.stream().map(RequestInfoMapper::toDomainModel).toList();
     }
 
     public static HttpRequestInfo toDomainModel(RequestInfoJpaEntity jpaEntity) {

@@ -7,11 +7,10 @@ import com.sc.sample.parsetojson.application.port.in.textconvert.TextDataToDomai
 import com.sc.sample.parsetojson.application.service.SimpleTextDataToDomainService;
 import com.sc.sample.parsetojson.model.SomeBizDomain;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.client.RestClient;
+import org.springframework.context.annotation.Configuration;
 
-@SpringBootApplication
+@Configuration
 public class SpringConfig {
 
     @Autowired

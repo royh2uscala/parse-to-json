@@ -1,0 +1,54 @@
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/requestinfodb
+    username: devco01
+    password: devco01
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+app:
+  ip-block-blacklist:
+    isoCountries:
+      - ES
+      - US
+      - CN
+    ispDataCenterVenues:
+      - venue:
+          code: AWS
+          searchTokens:
+            - AWS
+            - Amazon
+            - Amazon Web Service
+      - venue:
+          code: GCP
+          searchTokens:
+            - GCP
+            - Google
+            - Google Cloud Provider
+      - venue:
+          code: AZURE
+          searchTokens:
+            - AZURE
+            - Azure Microsoft
+            - AzureMicrosoft
+            - Azure-Microsoft
+            - Microsoft Azure
+            - Microsoft-Azure
+            - MicrosoftAzure
+            - Microsoft Azure
+  ip-info-white-list:
+    ip-cache-refresh-cron-schedule: "0 * * * * *"
+    rest-provider-venues:
+      - name: ip-api
+        rest-base-url: "http://localhost:8089/json"
+        activeProvider: true
+
+  validation:
+    file-upload-enabled: true
+    file-upload-max-size-mbs: 6
+
+

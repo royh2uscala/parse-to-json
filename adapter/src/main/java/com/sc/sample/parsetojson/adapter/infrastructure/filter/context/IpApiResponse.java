@@ -9,6 +9,10 @@ public record IpApiResponse(
         String org,
         String as
 ) {
+
+    public static IpApiResponse copy(IpApiResponse o) {
+        return new IpApiResponse(o.query, o.status, o.country, o.countryCode, o.isp, o.org, o.as);
+    }
     @Override
     public String toString() {
         return "IpApiResponse{" +

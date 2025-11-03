@@ -14,7 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BootStrapLauncher {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringConfig.class, args);
+        SpringApplication.run(BootStrapLauncher.class, args);
     }
 }
 

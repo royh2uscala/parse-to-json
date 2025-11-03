@@ -32,10 +32,7 @@ public class RequestInfoBuilderFilterTest {
     void setUp() {
         ipInfoService = mock(IpInfoService.class);
         requestInfoRepository = mock(RequestInfoRepository.class);
-        filter = new RequestInfoBuilderFilter(
-                ipInfoService,
-                requestInfoRepository,
-                Runnable::run);
+        filter = new RequestInfoBuilderFilter(ipInfoService, requestInfoRepository);
     }
 
     @Test

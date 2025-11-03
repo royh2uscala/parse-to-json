@@ -97,4 +97,18 @@ public class RequestInfoJpaEntity implements RequestInfo {
     public void setTimeLapsedMilli(long timeLapsedMilli) {
         this.timeLapsedMilli = timeLapsedMilli;
     }
+
+    @Override
+    public String toString() {
+        return "RequestInfoJpaEntity{" +
+                "requestId='" + requestId + '\'' +
+                ", requestUri='" + requestUri + '\'' +
+                ", startTime=" + startTime +
+                ", httpResponseCode=" + httpResponseCode +
+                ", requesterIp='" + requesterIp + '\'' +
+                ", requesterCountryCode='" + requesterCountryCode + '\'' +
+                ", ispProviderIp='" + ispProviderIp + '\'' +
+                ", timeLapsedMilli=" + timeLapsedMilli +
+                '}';
+    }
 }

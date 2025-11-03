@@ -6,6 +6,7 @@ import com.sc.sample.parsetojson.adapter.out.persistence.httprequest.RequestInfo
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -26,31 +27,21 @@ public class RequestInfoBuilderFilter implements Filter {
 
     private final RequestInfoRepository requestInfoRepository;
 
-    private final Executor executor;
 
-    public RequestInfoBuilderFilter(
-            IpInfoService ipInfoService,
-            RequestInfoRepository requestInfoRepository,
-            Executor executor) {
-        this.ipInfoService = ipInfoService;
-        this.requestInfoRepository = requestInfoRepository;
-        this.executor = executor;
-    }
+//    public RequestInfoBuilderFilter(
+//            IpInfoService ipInfoService,
+//            RequestInfoRepository requestInfoRepository,
+//            Executor executor) {
+//        this.ipInfoService = ipInfoService;
+//        this.requestInfoRepository = requestInfoRepository;
+//    }
+
+    @Autowired
     public RequestInfoBuilderFilter(
             IpInfoService ipInfoService,
             RequestInfoRepository requestInfoRepository) {
         this.ipInfoService = ipInfoService;
         this.requestInfoRepository = requestInfoRepository;
-        ThreadFactory threadFactory = new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread thread = new Thread();
-                thread.setName("save(httpRequestInfo)");
-                thread.setDaemon(true);
-                return thread;
-            }
-        };
-        this.executor = Executors.newCachedThreadPool(threadFactory);
     }
 
     @Override
@@ -70,7 +61,6 @@ public class RequestInfoBuilderFilter implements Filter {
 
             clientIpAddress = extractClientIPAddress(httpRequest);
             ipApiResponse = ipInfoService.lookupIp(clientIpAddress);
-
             RequestContextHolder.set(ipApiResponse);
 
             // Also attach to request attributes for servlet-based filters
@@ -86,6 +76,7 @@ public class RequestInfoBuilderFilter implements Filter {
         String id = UUID.randomUUID().toString();
         String requestUri = httpRequest.getRequestURI();
         int httpResponseCode = httpResponse.getStatus();
+        System.out.println("***** httpResponseCode:" + httpResponseCode);
         String requesterCountryCode = ipApiResponse.countryCode();
         String ispProviderIp = ipApiResponse.isp();
         long timeLapsedMillis = Duration.between(
@@ -100,7 +91,7 @@ public class RequestInfoBuilderFilter implements Filter {
                 .concat("post filterChain.doFilter - httpRequestInfo:%s").
                 formatted(httpRequestInfo));
 
-        executor.execute(() -> requestInfoRepository.save(httpRequestInfo));
+        requestInfoRepository.save(httpRequestInfo);
     }
 
     private String extractClientIPAddress(HttpServletRequest httpRequest) {
